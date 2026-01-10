@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<Robot type="FirstInspires-FTC">
+    <LynxUsbDevice name="Control Hub Portal" serialNumber="(embedded)" parentModuleAddress="173">
+        <LynxModule name="Control Hub" port="173">
+            <TetrixMotor name="Right Drive" port="0" />
+            <TetrixMotor name="Left Drive" port="1" />
+            <RevRoboticsCoreHexMotor name="Intake" port="2" />
+            <RevRoboticsUltraplanetaryHDHexMotor name="Outtake" port="3" />
+            <Servo name="Outtake Block" port="0" />
+            <ControlHubImuBHI260AP name="imu" port="0" bus="0" />
+        </LynxModule>
+    </LynxUsbDevice>
+    <Webcam name="Webcam 1" serialNumber="F2B8A130" />
+</Robot>
