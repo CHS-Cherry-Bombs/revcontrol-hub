@@ -1,73 +1,108 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-
-import org.firstinspires.ftc.teamcode.mechanisms.AprilTagWebcam;
 import org.firstinspires.ftc.teamcode.mechanisms.Motors;
 import org.firstinspires.ftc.teamcode.mechanisms.Shoot;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name="Red Goal")
-public class RedGoal extends OpMode {
+@Autonomous(name="Red Goal - 5:46")
+public class RedGoal extends LinearOpMode {
 
-    //This is the ideal distance for the robot to be in inches because this is the default.
-    //May need to be adjusted.
-    public final double IDEAL_Y_DISTANCE = 135.0 / 2.54; //Divided by 2.54 to convert cm to inches
-    public final double TICK_LIMIT = 2113; //3.5 feet approx. according to Gemini may need to be adjusted
     Motors motors = new Motors();
     Shoot shoot = new Shoot();
-    AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
+    //Imu robotImu = new Imu(); // 1. Instantiate the IMU
 
     @Override
-    public void init() {
+    public void runOpMode() {
         motors.init(hardwareMap);
         shoot.init(hardwareMap);
-        aprilTagWebcam.init(hardwareMap, telemetry);
-        telemetry.addData("Status", "Initialized");
+        //robotImu.init(hardwareMap); // 2. Initialize the IMU
+
+        waitForStart();
+
+        // --- STEP 1: Back up from the Goal ---
+        motors.setLeftMotorSpeed(-0.5);
+        motors.setRightMotorSpeed(-0.5);
+        sleep(900);
+        motors.setLeftMotorSpeed(0);
+        motors.setRightMotorSpeed(0);
+
+        // --- STEP 2: Shooting ---
+        shoot.setOuttakePower(1.0);
+        sleep(2800);
+        shoot.setIntakePower(0.25);
+        sleep(600);
+        shoot.setIntakePower(0);
+        sleep(300);
+        shoot.setIntakePower(0.25);
+        sleep(1500);
+        shoot.setOuttakePower(0);
+        shoot.setIntakePower(0);
+
+
+        sleep(500);
+
+        motors.setLeftMotorSpeed(-0.5);
+        motors.setRightMotorSpeed(0.5);
+        sleep(500);
+
+        motors.setLeftMotorSpeed(-0.5);
+        motors.setRightMotorSpeed(-0.5);
+
+        sleep(600);
+
+
+//        // --- STEP 3: Precise Turn using IMU ---
+//        turnToHeading(160, 0.05 );
+//
+//        // --- STEP 4: Drive into balls ---
+//        sleep(100);
+//
+//        motors.setLeftMotorSpeed(-0.4);
+//        motors.setRightMotorSpeed(-0.4);
+//
+//        sleep(800);
+
+        shoot.setIntakePower(0);
+        shoot.setOuttakePower(0);
+        motors.setLeftMotorSpeed(0);
+        motors.setRightMotorSpeed(0);
+
+//        sleep(800);
+//
+//        motors.setLeftMotorSpeed(0);
+//        motors.setRightMotorSpeed(0);
+//
+//        sleep(2000);
+//
+//        motors.setLeftMotorSpeed(0.4);
+//        motors.setRightMotorSpeed(0.4);
+//
+//        sleep(710);
+//
+//        motors.setLeftMotorSpeed(0);
+//        motors.setRightMotorSpeed(0);
+//
+//        robotImu.resetIMU();
+//
+//        turnToHeading(150, 0.05 );
+
+
     }
 
-
-    @Override
-    public void loop() {
-
-        aprilTagWebcam.update();
-
-        AprilTagDetection id24 = aprilTagWebcam.getTagBySpecificId(24);
-
-        // Get the absolute distance traveled in ticks
-        double currentTicks = Math.abs(motors.getEncoderTicks());
-
-        telemetry.addData("Encoder Ticks:", currentTicks);
-
-        // 1. FIRST PRIORITY: Fail-safe. Stop if we go too far.
-        if (currentTicks >= TICK_LIMIT) {
-            telemetry.addLine("FAIL-SAFE: Distance limit reached. Stopping.");
-            motors.setLeftMotorSpeed(0);
-            motors.setRightMotorSpeed(0);
-        }
-        // 2. SECOND PRIORITY: If we haven't seen the tag yet, keep searching.
-        else if (id24 == null) {
-            telemetry.addLine("Robot is looking for AprilTag...");
-            motors.setLeftMotorSpeed(-0.2); // Slower is better for camera detection
-            motors.setRightMotorSpeed(-0.2);
-        }
-        // 3. THIRD PRIORITY: Tag spotted! Adjust distance.
-        else {
-            double yDistance = id24.ftcPose.y;
-            telemetry.addData("Tag Spotted", "Distance: %.2f inches", yDistance);
-            shoot.setOuttakePower(1.0);
-
-            if (yDistance < IDEAL_Y_DISTANCE) {
-                telemetry.addLine("Adjusting: Backing up to target.");
-                motors.setLeftMotorSpeed(-0.2);
-                motors.setRightMotorSpeed(-0.2);
-            } else {
-                telemetry.addLine("Target Reached! Stopping.");
-                motors.setLeftMotorSpeed(0);
-                motors.setRightMotorSpeed(0);
-                shoot.setIntakePower(1.0);
-            }
-        }
-    }
+    //    public void turnToHeading(double targetAngle, double speed) {
+//        // Simple logic: if current heading is less than target, turn one way, else the other
+//        while (opModeIsActive() && Math.abs(robotImu.getHeading() - targetAngle) > 2) {
+//            if (robotImu.getHeading() < targetAngle) {
+//                motors.setLeftMotorSpeed(speed);
+//                motors.setRightMotorSpeed(-speed);
+//            }
+//            telemetry.addData("Target", targetAngle);
+//            telemetry.addData("Current", robotImu.getHeading());
+//            telemetry.update();
+//        }
+//        // Stop motors after turn is complete
+//        motors.setLeftMotorSpeed(0);
+//        motors.setRightMotorSpeed(0);
+//    }
 }
